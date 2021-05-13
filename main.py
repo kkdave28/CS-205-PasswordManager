@@ -6,6 +6,7 @@ import os
 import json
 from cryptography.fernet import Fernet
 DEBUG = True
+PASSWORD_RETRIES = 3
 CRED_KEY = b'uzGeNH-N7a8yjVjNTGcJE5PSJnWdqOxRQ3XU9Fh2CbE='
 DBASE_KEY = b'0-DwIS53LQ4H_IY8MI5VSQ-qI1Lf4TSGiXCmGiNjFRQ='
 cfile = "Store/users.txt"
@@ -69,25 +70,21 @@ def add_user() -> None:
     vault.close()
     return
 
-
-def delete_user() -> None:
+def authenticate_user(uname: str) -> bool:
     """
-        Deletes a user and removes their vault
+        Authenticates the user for deleting user or managing their vault
     """
-    uname = ""
     data = {}
     cred_file = open(cfile, "r")
     try:
         data = json.load(cred_file)
-        print("Please enter the username: ", end = "")
-        uname = input()
         if uname not in data:
             print("User " + uname + " does not exist!")
             cred_file.close()
             return
         cred_file.close()
         hashed_pass = decrypt_credentials(data[uname])
-        retries = 3
+        retries = PASSWORD_RETRIES
         while retries > 0:
             password = getpass.getpass("Password: ")
             if password != hashed_pass:
@@ -95,18 +92,42 @@ def delete_user() -> None:
                 retries-=1
                 print("Retries left: ", retries)
             else:
-                del data[uname]
-                vault_path = "Store/"+uname+".vault"
-                cred_file = open(cfile, "w")
-                os.remove(vault_path)
-                json.dump(data, cred_file, indent=4)
-                cred_file.close()
-                return
+                return True
     except JSONDecodeError:
         print("No users are created")
+        return
+    
+    print("No password retries left!")
+    return False
+
+def delete_user() -> None:
+    """
+        Deletes a user and removes their vault
+    """
+    print("Enter the username: ", end ="")
+    uname = input()
+    if authenticate_user(uname) == True:
+        vault_path = "Store/"+uname+".vault"
+        cred_file = open(cfile, "r")
+        data = json.load(cred_file)
+        cred_file.close()
+        cred_file = open(cfile, "w")
+        del data[uname]
+        os.remove(vault_path)
+        json.dump(data, cred_file, indent=4)
+        cred_file.close()
+        return
+    
 
 def access_vault() -> None:
-    pass
+    """
+        Opens the vault for the user and they can access their passwords for their saved sites.
+    """
+    print("Enter the username: ", end ="")
+    uname = input()
+    if authenticate_user(uname) == True:
+        print("Authentication Successful!") # Placeholder for now
+    
 
 def main() -> None:
     """
@@ -129,20 +150,6 @@ def main() -> None:
             access_vault()
         elif op == "4":
             break
-
-    """
-    print("Username: ", end = "")
-    user = input()
-    password = getpass.getpass("Password: ")
-    dbug("Username Entered: "+user)
-    dbug("Password Entered: "+password)
-    encrypted_cred = encrypt_credentials((user, password))
-    dbug("Encrypted user = " + encrypted_cred[0])
-    dbug("Encrypted pass = " + encrypted_cred[1])
-    decrypted_cred = decrypt_credentials((encrypted_cred[0], encrypted_cred[1]))
-    dbug("Decrypted user = " + decrypted_cred[0])
-    dbug("Decrypted pass = " + decrypted_cred[1])
-    """
     return
 
     
