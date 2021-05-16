@@ -1,5 +1,6 @@
 import getpass
 from json.decoder import JSONDecodeError
+from vault import Vault
 from FileIO import FileIO
 import os
 import json
@@ -12,6 +13,7 @@ class UserInterface:
     __Encryptor = Encryptor.getInstance()
     __FileIO = FileIO.getInstance()
     __Authenticator = Authenticator.getInstance()
+    __Vault = Vault.getInstance()
     @staticmethod
     def getInstance():
         """
@@ -64,11 +66,23 @@ class UserInterface:
         uname = input()
         if UserInterface.__Authenticator.authenticate_user(uname):
             print("Welcome to your vault!")
-            #placeholder for now
+            UserInterface.__Vault.access_vault(uname)
+            
     @staticmethod
     def clear_screen():
         """
             Method to clear screen for better visibility.
         """
         os.system("clear")
+    @staticmethod
+    def print_main_menu() -> None:
+        """
+            Prints the main interactive menu
+        """
+        print("""           Options
+        1 - Add user
+        2 - Delete user
+        3 - Access Vault
+        4 - Quit
+        """)
     

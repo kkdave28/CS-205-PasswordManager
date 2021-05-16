@@ -56,7 +56,7 @@ class Authenticator:
                 return True
         
         print("No password retries left!")
-        Authenticator.__cooldown[uname] = datetime.now(timezone.utc) + timedelta(0, 120)
+        Authenticator.__cooldown[uname] = datetime.now(timezone.utc) + timedelta(0, TIMEOUT)
         """
             Time out user here
         """

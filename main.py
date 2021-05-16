@@ -9,13 +9,7 @@ def main() -> None:
     """
     print("------------------------------Password Manager Test Suite--------------------------------------------")
     while True:
-        
-        print(""" Options
-        1 - Add user
-        2 - Delete user
-        3 - Access Vault
-        4 - Quit
-        """)
+        MainUI.print_main_menu()
         op = input()
         if op == "1":
             MainUI.add_user()
