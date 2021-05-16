@@ -10,6 +10,7 @@ def main() -> None:
     print("------------------------------Password Manager Test Suite--------------------------------------------")
     while True:
         MainUI.print_main_menu()
+        print("Main Menu Choice: ", end="")
         op = input()
         if op == "1":
             MainUI.add_user()

@@ -40,9 +40,12 @@ class Vault:
         )
     @staticmethod
     def access_vault(uname: str):
+        """
+            Run function that allows user to iteract with their vault
+        """
         while True:
             Vault.print_vault_menu()
-            print("Choice: ", end = "")
+            print("Vault Menu Choice: ", end = "")
             op = input()
             if op == "1":
                 Vault.__open_vault(uname)
@@ -58,6 +61,9 @@ class Vault:
                 print("Invalid Choice")
     @staticmethod
     def __print_vault_items(item: str, uname: str, password:str):
+        """
+            Decrypt and print vault items in plaintext
+        """
         print("Item: ", item)
         print("Username: ", uname)
         print("Password: ", Encryptor.decrypt_pass(password))
@@ -66,6 +72,9 @@ class Vault:
         print("")
     @staticmethod
     def __open_vault(uname: str):
+        """
+            Opens the vault and prints the vault items
+        """
         vault_dict = Vault.__FileIO.open_vault(uname)
         os.system("clear")
         if len(vault_dict) == 0:
@@ -80,6 +89,9 @@ class Vault:
         os.system("clear")
     @staticmethod
     def __add_item(uname: str):
+        """
+            Adds a new item to the vault, allows to add multiple logins for the same website
+        """
         vault_dict = Vault.__FileIO.open_vault(uname)
         print ("Enter the name of the item: ", end="")
         item = input()
@@ -99,6 +111,9 @@ class Vault:
         Vault.__FileIO.update_vault(uname, vault_dict)
     @staticmethod
     def __update_item(uname: str):
+        """
+            Update pre-existing vault items, allows user to change saved passwords associated with a username
+        """
         vault_dict = Vault.__FileIO.open_vault(uname)
         print ("Enter the name of the item you would like to update: ", end="")
         item = input()
@@ -121,6 +136,9 @@ class Vault:
         
     @staticmethod
     def __delete_item(uname: str):
+        """
+            Delete a particular vault item demoted by the item name and username
+        """
         vault_dict = Vault.__FileIO.open_vault(uname)
         print ("Enter the name of the item you would like to delete: ", end="")
         item = input()
