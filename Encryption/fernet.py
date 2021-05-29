@@ -1,9 +1,12 @@
 from cryptography.fernet import Fernet
-
+PATH_TO_KEYS = "/home/kkdave/CS-205-Project/PasswordManager/Secret/keys.txt"
+keys = []
+with open(PATH_TO_KEYS, "r") as key_file:
+    keys = key_file.read().splitlines()
 class Encryptor:
     __instance = None
-    __dbase_key = b'0-DwIS53LQ4H_IY8MI5VSQ-qI1Lf4TSGiXCmGiNjFRQ='
-    __cred_key = b'uzGeNH-N7a8yjVjNTGcJE5PSJnWdqOxRQ3XU9Fh2CbE='
+    __dbase_key = str.encode(keys[0])
+    __cred_key = str.encode(keys[1])
     __cred_encryptor = Fernet(__cred_key)
     __dbase_encryptor = Fernet(__dbase_key)
     @staticmethod

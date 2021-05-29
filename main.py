@@ -19,6 +19,8 @@ def main() -> None:
         elif op == "3":
             MainUI.access_vault()
         elif op == "4":
+            MainUI.Modify2FA()
+        elif op == "5":
             break
     return 0
 

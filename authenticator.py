@@ -4,6 +4,7 @@ import json
 from Encryption.fernet import Encryptor
 from FileIO import FileIO
 from datetime import datetime, timezone, timedelta
+from twofacauth import TwoFa
 DEBUG = True
 PASSWORD_RETRIES = 3
 TIMEOUT = 120
@@ -15,6 +16,7 @@ class Authenticator:
     __Encrypter = Encryptor.getInstance()
     __FileIO = FileIO.getInstance()
     __cooldown = {}
+    __TwoFa = TwoFa.getInstance()
     @staticmethod
     def getInstance():
         """
@@ -43,7 +45,7 @@ class Authenticator:
             cooldown_period = Authenticator.__cooldown[uname] - datetime.now(timezone.utc)
             print("Please try again after ", cooldown_period.total_seconds(), " seconds.")
             return False
-        hashed_pass = Authenticator.__Encrypter.decrypt_cred(data[uname])
+        hashed_pass = Authenticator.__Encrypter.decrypt_cred(data[uname]["password"])
         #hashed_pass = decrypt_credentials(data[uname])
         retries = PASSWORD_RETRIES
         while retries > 0:
@@ -53,7 +55,22 @@ class Authenticator:
                 retries-=1
                 print("Retries left: ", retries)
             else:
-                return True
+                if "TWOFA" in data[uname]:
+                    retries = PASSWORD_RETRIES
+                    otp_key = Authenticator.__Encrypter.decrypt_cred(data[uname]["TWOFA"])
+                    while retries > 0:
+                        print("Please enter your Two Factor Authentication code: ", end = "")
+                        otp = input()
+                        if not Authenticator.__TwoFa.validate_otp(otp_key, otp):
+                            print("Error! Incorrect OTP entered. Please try again.")
+                            retries-=1
+                            print("Retries left: ", retries)
+                        else:
+                            return True
+                else:
+                    return True
+
+
         
         print("No password retries left!")
         Authenticator.__cooldown[uname] = datetime.now(timezone.utc) + timedelta(0, TIMEOUT)
